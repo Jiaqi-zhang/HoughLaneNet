@@ -1,6 +1,6 @@
 # HoughLaneNet: lane detection with deep hough transform and dynamic convolution
 
-This repository contains the code for the HoughLaneNet model described in *HoughLaneNet: lane detection with deep hough transform and dynamic convolution* ([Paper Link](https://arxiv.org/pdf/2307.03494.pdf)), Zhang et al., 2023.
+This repository contains the code for the HoughLaneNet model described in *HoughLaneNet: lane detection with deep hough transform and dynamic convolution* ([Paper Link](https://arxiv.org/pdf/2307.03494.pdf)), Zhang et al., 2023. HoughLaneNet adapts [DeepHoughTransform](https://github.com/Hanqer/deep-hough-transform) to detect instance-level lane markings and produce pixel-level segmentation of lanes in a single-stage framework.
 
 This code is based on [MMDetection](https://github.com/open-mmlab/mmdetection) framework and is tested under Ubuntu 20.04.
 
