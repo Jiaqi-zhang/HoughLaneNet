@@ -1,34 +1,25 @@
-dataset_type = 'TuSimpleDataset'
-data_root = './datasets/TuSimple/'
-work_dir = './work_dirs/final_smean/tusimple/res_medium'
+dataset_type = 'CULaneDataset'
+data_root = './datasets/CULane/'
+work_dir = './work_dirs/final_smean/culane/res_large'
 img_norm_cfg = dict(
     mean=[75.3, 76.6, 77.6], std=[50.5, 53.8, 54.3], to_rgb=True)
 img_scale = (640, 360)
-ori_scale = (1280, 720)
-h_samples = [
-    160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300,
-    310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410, 420, 430, 440, 450,
-    460, 470, 480, 490, 500, 510, 520, 530, 540, 550, 560, 570, 580, 590, 600,
-    610, 620, 630, 640, 650, 660, 670, 680, 690, 700, 710
-]
+ori_scale = (1640, 590)
 line_width = 5
-max_num_lane = 5
+max_num_lane = 4
 hough_point_radius = 3
 hough_point_ratio = 1.0
-total_epochs = 150
-batch_size = 3
-threshold = 0.1
-select_mode = 'nms'  # [nms, region]
-line_mode = 'line'  # [line, hough]
-
-backbone_head = 3
-backbone_layer = 4
-d_model = 128
-d_ins = 32
+total_epochs = 20
+batch_size = 2
+threshold = 0.13
+select_mode = 'nms'
+line_mode = 'line'
+d_model = 192
+d_ins = 48
 groups = 4
-hough_scale = 3
-num_angle = 300
-num_rho = 300
+hough_scales = [3, 3, 3]
+num_angle = 360
+num_rho = 216
 fea_size = (90, 160)
 train_compose = dict(bboxes=False, keypoints=True, masks=False)
 train_al_pipeline = [
@@ -183,10 +174,10 @@ train_pipeline = [
     dict(
         type='CollectLane',
         line_width=5,
-        line_mode=line_mode,
-        max_num_lane=5,
-        num_angle=300,
-        num_rho=300,
+        line_mode='line',
+        max_num_lane=4,
+        num_angle=360,
+        num_rho=216,
         hough_point_radius=3,
         hough_point_ratio=1.0,
         keys=['img', 'segment_map', 'hough_map', 'line_map', 'point_list'],
@@ -202,7 +193,70 @@ val_pipeline = [
             dict(
                 type='Compose',
                 params=dict(bboxes=False, keypoints=True, masks=False)),
-            dict(type='Resize', height=360, width=640, p=1)
+            dict(type='Resize', height=360, width=640, p=1),
+            dict(
+                type='OneOf',
+                transforms=[
+                    dict(
+                        type='RGBShift',
+                        r_shift_limit=15,
+                        g_shift_limit=15,
+                        b_shift_limit=15,
+                        p=1.0),
+                    dict(
+                        type='HueSaturationValue',
+                        hue_shift_limit=(-10, 10),
+                        sat_shift_limit=(-15, 15),
+                        val_shift_limit=(-10, 10),
+                        p=1.0),
+                    dict(type='FancyPCA', alpha=0.2, p=1.0)
+                ],
+                p=0.6),
+            dict(
+                type='ImageCompression',
+                quality_lower=85,
+                quality_upper=95,
+                p=0.5),
+            dict(type='CLAHE', p=0.5),
+            dict(
+                type='OneOf',
+                transforms=[
+                    dict(type='Blur', blur_limit=3, p=1.0),
+                    dict(type='MedianBlur', blur_limit=3, p=1.0),
+                    dict(type='GaussianBlur', blur_limit=(3, 5), p=1.0)
+                ],
+                p=0.1),
+            dict(
+                type='ColorJitter',
+                brightness=0.5,
+                contrast=0.5,
+                saturation=0.5,
+                hue=0.5,
+                always_apply=True,
+                p=1),
+            dict(
+                type='RandomBrightnessContrast',
+                brightness_limit=0.25,
+                contrast_limit=0.25,
+                p=0.6),
+            dict(
+                type='OneOf',
+                transforms=[
+                    dict(
+                        type='RandomFog',
+                        fog_coef_lower=0.1,
+                        fog_coef_upper=0.3,
+                        p=1.0),
+                    dict(type='RandomShadow', p=1.0)
+                ],
+                p=0.1),
+            dict(type='HorizontalFlip', p=0.5),
+            dict(
+                type='ShiftScaleRotate',
+                shift_limit=0.12,
+                scale_limit=0.08,
+                rotate_limit=25,
+                p=0.8)
         ]),
     dict(
         type='Normalize',
@@ -213,10 +267,10 @@ val_pipeline = [
     dict(
         type='CollectLane',
         line_width=5,
-        line_mode=line_mode,
-        max_num_lane=5,
-        num_angle=300,
-        num_rho=300,
+        line_mode='line',
+        max_num_lane=4,
+        num_angle=360,
+        num_rho=216,
         hough_point_radius=3,
         hough_point_ratio=1.0,
         keys=['img', 'segment_map', 'hough_map', 'line_map', 'point_list'],
@@ -243,10 +297,10 @@ test_pipeline = [
     dict(
         type='CollectLane',
         line_width=5,
-        line_mode=line_mode,
-        max_num_lane=5,
-        num_angle=300,
-        num_rho=300,
+        line_mode='line',
+        max_num_lane=4,
+        num_angle=360,
+        num_rho=216,
         hough_point_radius=3,
         hough_point_ratio=1.0,
         keys=['img', 'segment_map', 'hough_map', 'line_map', 'point_list'],
@@ -256,15 +310,14 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=3,
-    workers_per_gpu=3,
+    samples_per_gpu=2,
+    workers_per_gpu=2,
     train=dict(
-        type='TuSimpleDataset',
+        type='CULaneDataset',
         data_root=data_root,
+        data_json_dir='json_lanes_train',
         data_list=[
-            data_root + 'label_data_0313.json',
-            data_root + 'label_data_0531.json',
-            data_root + 'label_data_0601.json',
+            data_root + 'list/train.txt',
         ],
         pipeline=[
             dict(
@@ -349,10 +402,10 @@ data = dict(
             dict(
                 type='CollectLane',
                 line_width=5,
-                line_mode=line_mode,
-                max_num_lane=5,
-                num_angle=300,
-                num_rho=300,
+                line_mode='line',
+                max_num_lane=4,
+                num_angle=360,
+                num_rho=216,
                 hough_point_radius=3,
                 hough_point_ratio=1.0,
                 keys=[
@@ -364,20 +417,14 @@ data = dict(
                 ])
         ],
         test_mode=False,
-        ori_scale=(1280, 720),
+        ori_scale=(1640, 590),
         img_scale=(640, 360),
-        max_num_lane=5,
-        h_samples=[
-            160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280,
-            290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410,
-            420, 430, 440, 450, 460, 470, 480, 490, 500, 510, 520, 530, 540,
-            550, 560, 570, 580, 590, 600, 610, 620, 630, 640, 650, 660, 670,
-            680, 690, 700, 710
-        ]),
+        max_num_lane=4),
     val=dict(
-        type='TuSimpleDataset',
+        type='CULaneDataset',
         data_root=data_root,
-        data_list=[data_root + 'test_label.json'],
+        data_json_dir='json_lanes_train',
+        data_list=[data_root + 'list/val.txt'],
         pipeline=[
             dict(
                 type='albumentation',
@@ -386,7 +433,71 @@ data = dict(
                         type='Compose',
                         params=dict(bboxes=False, keypoints=True,
                                     masks=False)),
-                    dict(type='Resize', height=360, width=640, p=1)
+                    dict(type='Resize', height=360, width=640, p=1),
+                    dict(
+                        type='OneOf',
+                        transforms=[
+                            dict(
+                                type='RGBShift',
+                                r_shift_limit=15,
+                                g_shift_limit=15,
+                                b_shift_limit=15,
+                                p=1.0),
+                            dict(
+                                type='HueSaturationValue',
+                                hue_shift_limit=(-10, 10),
+                                sat_shift_limit=(-15, 15),
+                                val_shift_limit=(-10, 10),
+                                p=1.0),
+                            dict(type='FancyPCA', alpha=0.2, p=1.0)
+                        ],
+                        p=0.6),
+                    dict(
+                        type='ImageCompression',
+                        quality_lower=85,
+                        quality_upper=95,
+                        p=0.5),
+                    dict(type='CLAHE', p=0.5),
+                    dict(
+                        type='OneOf',
+                        transforms=[
+                            dict(type='Blur', blur_limit=3, p=1.0),
+                            dict(type='MedianBlur', blur_limit=3, p=1.0),
+                            dict(
+                                type='GaussianBlur', blur_limit=(3, 5), p=1.0)
+                        ],
+                        p=0.1),
+                    dict(
+                        type='ColorJitter',
+                        brightness=0.5,
+                        contrast=0.5,
+                        saturation=0.5,
+                        hue=0.5,
+                        always_apply=True,
+                        p=1),
+                    dict(
+                        type='RandomBrightnessContrast',
+                        brightness_limit=0.25,
+                        contrast_limit=0.25,
+                        p=0.6),
+                    dict(
+                        type='OneOf',
+                        transforms=[
+                            dict(
+                                type='RandomFog',
+                                fog_coef_lower=0.1,
+                                fog_coef_upper=0.3,
+                                p=1.0),
+                            dict(type='RandomShadow', p=1.0)
+                        ],
+                        p=0.1),
+                    dict(type='HorizontalFlip', p=0.5),
+                    dict(
+                        type='ShiftScaleRotate',
+                        shift_limit=0.12,
+                        scale_limit=0.08,
+                        rotate_limit=25,
+                        p=0.8)
                 ]),
             dict(
                 type='Normalize',
@@ -397,10 +508,10 @@ data = dict(
             dict(
                 type='CollectLane',
                 line_width=5,
-                line_mode=line_mode,
-                max_num_lane=5,
-                num_angle=300,
-                num_rho=300,
+                line_mode='line',
+                max_num_lane=4,
+                num_angle=360,
+                num_rho=216,
                 hough_point_radius=3,
                 hough_point_ratio=1.0,
                 keys=[
@@ -412,22 +523,16 @@ data = dict(
                 ])
         ],
         test_mode=False,
-        ori_scale=(1280, 720),
+        ori_scale=(1640, 590),
         img_scale=(640, 360),
-        max_num_lane=5,
-        h_samples=[
-            160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280,
-            290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410,
-            420, 430, 440, 450, 460, 470, 480, 490, 500, 510, 520, 530, 540,
-            550, 560, 570, 580, 590, 600, 610, 620, 630, 640, 650, 660, 670,
-            680, 690, 700, 710
-        ],
+        max_num_lane=4,
         cp_work_dir=work_dir + '/outputs',
         samples_per_gpu=1),
     test=dict(
-        type='TuSimpleDataset',
+        type='CULaneDataset',
         data_root=data_root,
-        data_list=[data_root + 'test_label.json'],
+        data_json_dir='json_lanes_test',
+        data_list=[data_root + 'list/test.txt'],
         test_suffix='.jpg',
         pipeline=[
             dict(
@@ -448,10 +553,10 @@ data = dict(
             dict(
                 type='CollectLane',
                 line_width=5,
-                line_mode=line_mode,
-                max_num_lane=5,
-                num_angle=300,
-                num_rho=300,
+                line_mode='line',
+                max_num_lane=4,
+                num_angle=360,
+                num_rho=216,
                 hough_point_radius=3,
                 hough_point_ratio=1.0,
                 keys=[
@@ -463,18 +568,11 @@ data = dict(
                 ])
         ],
         test_mode=True,
-        ori_scale=(1280, 720),
+        ori_scale=(1640, 590),
         img_scale=(640, 360),
-        max_num_lane=5,
-        h_samples=[
-            160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280,
-            290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410,
-            420, 430, 440, 450, 460, 470, 480, 490, 500, 510, 520, 530, 540,
-            550, 560, 570, 580, 590, 600, 610, 620, 630, 640, 650, 660, 670,
-            680, 690, 700, 710
-        ],
+        max_num_lane=4,
         cp_work_dir=work_dir + '/outputs',
-        samples_per_gpu=8))
+        samples_per_gpu=16))
 model = dict(
     type='LaneDetector',
     base_data=dict(
@@ -482,10 +580,10 @@ model = dict(
         image_width=640,
         patch_height=10,
         patch_width=10,
-        d_model=128),
+        d_model=192),
     backbone=dict(
         type='ResNet',
-        depth=34,
+        depth=101,
         strides=(1, 2, 2, 2),
         num_stages=4,
         out_indices=[0, 1, 2, 3],
@@ -493,33 +591,33 @@ model = dict(
         norm_cfg=dict(type='BN', requires_grad=True),
         norm_eval=True,
         style='pytorch',
-        init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet34')),
+        init_cfg=dict(type='Pretrained',
+                      checkpoint='torchvision://resnet101')),
     neck=dict(
         type='FPN',
-        in_channels=[64, 128, 256, 512],
-        out_channels=128,
+        in_channels=[256, 512, 1024, 2048],
+        out_channels=192,
         num_outs=4),
     head=dict(
         type='DenseLaneHead',
         image_size=(360, 640),
-        max_num_lane=5,
-        d_model=128,
-        d_ins=32,
+        max_num_lane=4,
+        d_model=192,
+        d_ins=48,
         groups=4,
-        hough_scale=3,
-        num_angle=300,
-        num_rho=300,
+        hough_scales=hough_scales,
+        num_angle=360,
+        num_rho=216,
         fea_size=(90, 160),
-        threshold=threshold,
-        select_mode=select_mode,
-        ),
+        threshold=0.12,
+        select_mode=select_mode),
     loss_weights=dict(
         seg_weight=100.0,
         hough_weight=1000.0,
         line_weight=100.0,
         range_weight=10.0,
         lane_weight=100.0,
-        pos_weight=[10, 10, 10, 10, 10]))
+        pos_weight=[10, 10, 10, 10]))
 optimizer = dict(
     type='AdamW', lr=0.0003, betas=(0.9, 0.999), eps=1e-08, weight_decay=1e-07)
 optimizer_config = dict(grad_clip=None)
@@ -528,20 +626,20 @@ lr_config = dict(
     warmup='constant',
     warmup_iters=10,
     warmup_ratio=0.3333333333333333,
-    step=15,
+    step=1,
     gamma=0.9,
     min_lr=0.0001)
-runner = dict(type='EpochBasedRunner', max_epochs=150)
-checkpoint_config = dict(interval=5)
+runner = dict(type='EpochBasedRunner', max_epochs=20)
+checkpoint_config = dict(interval=1)
 log_config = dict(
     interval=20,
     hooks=[dict(type='TextLoggerHook'),
            dict(type='TensorboardLoggerHook')])
-evaluation = dict(interval=5)
+evaluation = dict(interval=1)
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 load_from = None
 resume_from = None
 find_unused_parameters = True
 cudnn_benchmark = True
-workflow = [('train', 300), ('val', 1)]
+workflow = [('train', 1), ('val', 1)]

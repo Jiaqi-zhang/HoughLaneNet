@@ -10,13 +10,14 @@ This code is based on [MMDetection](https://github.com/open-mmlab/mmdetection) f
 ## Requirements
 
 + 64-bit Python 3.8 or higher
++ CUDA 11.3
 + Pytorch (>=1.10.0) and torchvision (>=0.11.1)
 + Install mmcv (should match Pytorch version)
   ```bash
   conda create -n mmlab python=3.8 -y
   conda activate mmlab
   conda install pytorch==1.10.0 torchvision torchaudio cudatoolkit=11.3 -c pytorch
-  python -m pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu112/torch1.10.0/index.html
+  python -m pip install mmcv-full==1.5.0 -f https://download.openmmlab.com/mmcv/dist/cu113/torch1.10/index.html
   ```
 + Python libraries: `opencv-python scipy tqdm matplotlib einops albumentations tensorboard future`
 + Install mmdetection with the following commands:
@@ -111,19 +112,15 @@ Medium(ResNet-34) | 97.68 | 96.93 | 125 | [download](https://drive.google.com/uc
 Large(ResNet-101) | 97.31 | 96.43 | 57 | [download](https://drive.google.com/uc?id=1j4EidFb-LNl8xvom9zwpPfYSgH1OdwQS)
 
 
-<!--
-Pretrained weights on CULane will added later.
 
 **CULane**
 
 Model | F1 | Speed (FPS) | Pretrained Model
 ---:|:---:|:---:|:---
-Small(ResNet-18) | 78.73 | 155 | [download]()
-Medium(ResNet-34) | 78.87 | 148 | [download]()
-Large(ResNet-101) | 78.97 | 56 | [download]()
-Large(PVTv2-b3) | 79.81 | 61 | [download]() 
-
--->
+Small(ResNet-18) | 78.73 | 155 | [download](https://drive.google.com/uc?id=1crhZPCE8o8rJbwzxgvOwUBQK5Wc6npr7)
+Medium(ResNet-34) | 78.87 | 148 | [download](https://drive.google.com/uc?id=1aV3rLvTXy7-0804lAPPfwmhSXPCIvTD1)
+Large(ResNet-101) | 78.97 | 56 | [download](https://drive.google.com/uc?id=13uFHH8ZEfBJ1TF027TW2vr2HwxKJVqtI)
+Large(PVTv2-b3) | 79.81 | 61 | [download](https://drive.google.com/uc?id=1NoR-fIK-Lu6EeaR8mmF3DfkLYw4xp1WC) 
 
 
 **LLAMAS**

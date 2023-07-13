@@ -542,4 +542,3 @@ load_from = None
 find_unused_parameters = True
 cudnn_benchmark = True
 workflow = [('train', 300), ('val', 1)]
-gpu_ids = range(0, 6)
