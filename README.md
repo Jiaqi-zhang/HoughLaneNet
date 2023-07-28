@@ -61,11 +61,12 @@ Then the directory should be like follows:
 ├── culane
 |   ├── res_small
 |   ├── res_medium
-|   └── res_large
+|   ├── res_large
+|   └── pvt_b3_large
 └── llamas
-    └── res_small
-    └── res_medium
-    └── res_large
+    ├── res_small
+    ├── res_medium
+    ├── res_large
     └── pvt_b3_large
 ```
 
@@ -84,7 +85,7 @@ For example, train the network with Resnet18+FPN config on TuSimple dataset with
 CUDA_VISIBLE_DEVICES=0,1,2 bash tools/dist_train.sh configs/lane/tusimple_res_small_fpn.py 3 --no-validate
 ```
 
-### Evaulate
+### Test
 
 Command to evaluate a trained network for TuSimple, CULane and LLAMAS dataset respectively:
 ```bash
@@ -95,9 +96,26 @@ bash tools/dist_metric_llamas.sh <path to config file> <path to checkpoint file>
 
 For example, run the following command:
 ```bash
+# TuSimple test dataset evaluation
 CUDA_VISIBLE_DEVICES=0 bash tools/single_metric_tusimple.sh configs/lane/tusimple_res_small.py ./pretrained_weights/tusimple/res_small/epoch.pth --eval
-CUDA_VISIBLE_DEVICES=0,1,2 bash tools/dist_metric_culane.sh configs/lane/culane_res_small.py ./pretrained_weights/culane/res_small/epoch.pth 3 --eval
-CUDA_VISIBLE_DEVICES=0,1,2 bash tools/dist_metric_llamas.sh configs/lane/llamas_res_small.py ./pretrained_weights/llamas/res_small/epoch.pth 3 --eval
+
+# CULane test dataset evaluation
+CUDA_VISIBLE_DEVICES=0,1,2 bash tools/dist_metric_culane.sh configs/lane/culane_pvt_b3_large.py ./pretrained_weights/culane/pvt_b3_large/epoch.pth 3 --eval
+
+# LLAMAS test dataset evaluation
+CUDA_VISIBLE_DEVICES=0,1,2 bash tools/dist_metric_llamas.sh configs/lane/llamas_pvt_b3_large.py ./pretrained_weights/llamas/pvt_b3_large/epoch.pth 3 --eval
+```
+
+### Inference
+
+Run the following scripts to predict the position of lanes and output the visualization results.
+
+```bash
+# TuSimple test dataset evaluation
+CUDA_VISIBLE_DEVICES=0 bash tools/single_disp_tusimple.sh configs/lane/tusimple_res_large.py ./pretrained_weights/tusimple/res_large/epoch.pth --eval --data-dir ./demo/input/ --show-dir ./demo/output/
+
+# CULane test dataset evaluation
+CUDA_VISIBLE_DEVICES=0 bash tools/single_disp_culane.sh configs/lane/culane_res_large.py ./pretrained_weights/culane/res_large/epoch.pth --eval --data-dir ./demo/input/ --show-dir ./demo/output/
 ```
 
 
