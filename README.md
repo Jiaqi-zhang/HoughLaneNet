@@ -120,17 +120,17 @@ CUDA_VISIBLE_DEVICES=0 bash tools/single_disp_culane.sh configs/lane/culane_res_
 
 The following shows some prediction results on the TuSimple and CULane test datasets. The yellow lines represent the positions of the real lanes, while the purple lines represent the positions of the model predicted lanes.
 
-<center>
+<div align=center>
 <img src="./demo/output/tusimple/0530_1492627165541605354_0_20.jpg" width="30%"/>
 <img src="./demo/output/tusimple/0530_1492626390014458579_0_20.jpg" width="30%"/>
 <img src="./demo/output/tusimple/0530_1492626520934288174_0_20.jpg" width="30%"/>
-</center>
+</div>
 
-<center>
+<div align=center>
 <img src="./demo/output/culane/driver_37_30frame_05190703_0347.MP4_00990.jpg" width="30%"/>
 <img src="./demo/output/culane/driver_37_30frame_05182007_0315.MP4_02370.jpg" width="30%"/>
 <img src="./demo/output/culane/driver_37_30frame_05181432_0203.MP4_01860.jpg" width="30%"/>
-</center>
+</div>
 
 
 ## Results and Pretrained Models
