@@ -19,7 +19,7 @@ This code is based on [MMDetection](https://github.com/open-mmlab/mmdetection) f
   conda install pytorch==1.10.0 torchvision torchaudio cudatoolkit=11.3 -c pytorch
   python -m pip install mmcv-full==1.5.0 -f https://download.openmmlab.com/mmcv/dist/cu113/torch1.10/index.html
   ```
-+ Python libraries: `opencv-python scipy tqdm matplotlib einops albumentations tensorboard future`
++ Python libraries: `opencv-python scipy tqdm matplotlib einops albumentations tensorboard future ujson pycocotool terminaltables`
 + Install mmdetection with the following commands:
   ```bash
   git clone https://github.com/open-mmlab/mmdetection.git
@@ -28,6 +28,7 @@ This code is based on [MMDetection](https://github.com/open-mmlab/mmdetection) f
   ```
 + Install the deep-hough-transform operator with the following commands:
   ```bash
+  cd HoughLaneNet
   cd mmdet/models/utils/dht_op
   python setup.py build
   python setup.py install
